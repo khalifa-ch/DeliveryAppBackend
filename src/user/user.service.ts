@@ -125,4 +125,23 @@ export class UserService {
 
     return this.userRepository.remove(user);
   }
+  async getDeliverers(): Promise<User[]> {
+    const users = await this.userRepository
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.userRoles', 'userRole')
+    .leftJoinAndSelect('userRole.role', 'role')
+    .getMany();
+
+  return users.filter(user => user.userRoles.length > 0 && user.userRoles[0].role.name === RoleEnum.Deliverer)
+  }
+  async getStoreOnwners(): Promise<User[]> {
+    const users = await this.userRepository
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.userRoles', 'userRole')
+    .leftJoinAndSelect('userRole.role', 'role')
+    .getMany();
+
+  return users.filter(user => user.userRoles.length > 0 && user.userRoles[0].role.name === RoleEnum.StoreOwner)
+  }
+
 }

@@ -23,6 +23,14 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
+  @Get('deliverers')
+  async getDeliverers() {
+    return this.userService.getDeliverers();
+  }
+  @Get('storeowners')
+  async getStorOwners() {
+    return this.userService.getStoreOnwners();
+  }
   @Post('storeOwner')
   async createStoreOwner(@Body() createUserDto: CreateUserDto) {
     return await this.userService.createStoreOwner(createUserDto);
@@ -69,4 +77,5 @@ export class UserController {
     };
     return this.authService.refreshToken(payload);
   }
+ 
 }
