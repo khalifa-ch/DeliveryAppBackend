@@ -7,6 +7,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { RoleModule } from './role/role.module';
 import { UserRoleModule } from './user-role/user-role.module';
+import { StoreModule } from './store/store.module';
+import { OrderModule } from './order/order.module';
+import { EntrepotModule } from './entrepot/entrepot.module';
+import { CarModule } from './car/car.module';
 
 @Module({
   imports: [
@@ -32,6 +36,10 @@ import { UserRoleModule } from './user-role/user-role.module';
     UserModule,
     RoleModule,
     UserRoleModule,
+    StoreModule,
+    OrderModule,
+    EntrepotModule,
+    CarModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -105,7 +105,7 @@ export class UserService {
 
   async findByEmail(email: string) {
     return await this.userRepository.findOneBy({ email });
-  }
+  }   
 
   async update(id: number, attrs: Partial<User>) {
     const user = await this.userRepository.findOneBy({ id: id });
