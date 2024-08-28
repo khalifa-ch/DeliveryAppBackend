@@ -11,6 +11,7 @@ import { StoreModule } from './store/store.module';
 import { OrderModule } from './order/order.module';
 import { EntrepotModule } from './entrepot/entrepot.module';
 import { CarModule } from './car/car.module';
+import { CityModule } from './city/city.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { CarModule } from './car/car.module';
     OrderModule,
     EntrepotModule,
     CarModule,
+    CityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
