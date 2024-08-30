@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { OrderStatus } from './oderStatus';
+import { Store } from 'src/store/store.entity';
 
 @Entity()
 export class Order {
@@ -29,4 +31,7 @@ export class Order {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => Store, (store) => store.orders)
+  store: Store;
 }

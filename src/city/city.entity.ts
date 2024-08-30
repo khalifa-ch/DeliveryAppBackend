@@ -1,9 +1,12 @@
+import { Entrepot } from 'src/entrepot/entrepot.entity';
+import { Store } from 'src/store/store.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -19,4 +22,11 @@ export class City {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Store, (store) => store.city)
+  stores: Store[];
+
+  @OneToMany(() => Entrepot, (entrepot) => entrepot.city)
+  entrepots: Entrepot[];
+
 }
