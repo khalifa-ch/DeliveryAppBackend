@@ -1,18 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './order.entity';
 import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/order.dto';
+import { StoreService } from 'src/store/store.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectRepository(Order)
     private orderRepository: Repository<Order>,
+    private storeService: StoreService,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+  async create(
+    createOrderDto: CreateOrderDto,
+    storeId: string,
+  ): Promise<Order> {
     const order = this.orderRepository.create(createOrderDto);
+    if (!storeId) {
+      throw new BadRequestException('plz provide a storeId');
+    }
+    const store = await this.storeService.getById(parseInt(storeId));
+    order.store = store;
     return await this.orderRepository.save(order);
   }
 
@@ -42,5 +56,17 @@ export class OrderService {
       throw new NotFoundException(`order with ID ${id} not found`);
     }
     return this.orderRepository.remove(order);
+  }
+  async getMyOrders(userId: number, storeId?: number) {
+    const orders = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoin('order.store', 'store')
+      .where('store.userId = :userId', { userId });
+
+    if (storeId) {
+      orders.andWhere('store.id = :storeId', { storeId });
+    }
+
+    return orders.getMany();
   }
 }

@@ -3,16 +3,26 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Entrepot } from './entrepot.entity';
 import { Repository } from 'typeorm';
 import { CreateEntrepotDto } from './entrepot.dto';
+import { User } from 'src/user/entities/user.entity';
+import { CityService } from 'src/city/city.service';
 
 @Injectable()
 export class EntrepotService {
   constructor(
     @InjectRepository(Entrepot)
     private readonly entrepotRepository: Repository<Entrepot>,
+    private cityService: CityService,
   ) {}
 
-  async create(createEntrepotDto: CreateEntrepotDto): Promise<Entrepot> {
+  async create(
+    createEntrepotDto: CreateEntrepotDto,
+    user: User,
+    cityId: string,
+  ): Promise<Entrepot> {
     const entrepot = this.entrepotRepository.create(createEntrepotDto);
+    const city = await this.cityService.findOne(parseInt(cityId));
+    entrepot.user = user;
+    entrepot.city = city;
     return this.entrepotRepository.save(entrepot);
   }
 
@@ -42,5 +52,15 @@ export class EntrepotService {
       throw new NotFoundException(`entrepot with ID ${id} not found`);
     }
     return this.entrepotRepository.remove(entrepot);
+  }
+
+  async getMyEntrepot(userId: number) {
+    const entrepots = await this.entrepotRepository
+      .createQueryBuilder('entrepot')
+      .leftJoinAndSelect('entrepot.city', 'city')
+      .where('entrepot.user= :userId', { userId })
+      .getMany();
+
+    return entrepots;
   }
 }

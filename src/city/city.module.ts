@@ -8,6 +8,7 @@ import { CitySeeder } from './city.seeder';
 @Module({
   imports: [TypeOrmModule.forFeature([City])],
   controllers: [CityController],
-  providers: [CityService,CitySeeder],
+  providers: [CityService, CitySeeder],
+  exports: [CityService],
 })
 export class CityModule {}

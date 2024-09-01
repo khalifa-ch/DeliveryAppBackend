@@ -35,5 +35,5 @@ export class Store {
   orders: Order[];
 
   @ManyToOne(() => City, (city) => city.stores)
-  city: City; 
+  city: City;
 }

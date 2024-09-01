@@ -6,18 +6,34 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateOrderDto, UpdateOrderDto } from './dto/order.dto';
 import { OrderService } from './order.service';
 import { Order } from './order.entity';
+import { JwtGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('order')
+@UseGuards(JwtGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(
+    @Body() createOrderDto: CreateOrderDto,
+    @Body('storeId') storeId: string,
+    @Req() req,
+  ) {
+    console.log(req.user);
+    return this.orderService.create(createOrderDto, storeId);
+  }
+  @Get('MyOrders')
+  async MyCars(@Query('storeId') storeId: number, @Req() req) {
+    const userId = req.user.id;
+    console.log(req.user);
+    return this.orderService.getMyOrders(parseInt(userId), storeId);
   }
 
   @Get(':id')

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from './car.entity';
 import { Repository } from 'typeorm';
 import { CreateCarDto } from './car.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class CarService {
@@ -11,8 +12,9 @@ export class CarService {
     private readonly carRepository: Repository<Car>,
   ) {}
 
-  async create(createCarDto: CreateCarDto): Promise<Car> {
+  async create(createCarDto: CreateCarDto, user: User): Promise<Car> {
     const car = this.carRepository.create(createCarDto);
+    car.user = user;
     return this.carRepository.save(car);
   }
 
@@ -40,5 +42,14 @@ export class CarService {
       throw new NotFoundException(`car with ID ${id} not found`);
     }
     return this.carRepository.remove(car);
+  }
+
+  async getMyCars(userId: number) {
+    const cars = await this.carRepository
+      .createQueryBuilder('car')
+      .where('car.user= :userId', { userId })
+      .getMany();
+
+    return cars;
   }
 }

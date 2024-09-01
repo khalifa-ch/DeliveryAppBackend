@@ -6,22 +6,34 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { EntrepotService } from './entrepot.service';
 import { CreateEntrepotDto, UpdateEntrepotDto } from './entrepot.dto';
 import { Entrepot } from './entrepot.entity';
+import { JwtGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('entrepot')
+@UseGuards(JwtGuard)
 export class EntrepotController {
   constructor(private readonly entrepotService: EntrepotService) {}
 
   @Post()
-  create(@Body() createEntrepotDto: CreateEntrepotDto) {
-    return this.entrepotService.create(createEntrepotDto);
+  create(
+    @Body() createEntrepotDto: CreateEntrepotDto,
+    @Req() req,
+    @Body('cityId') cityId: string,
+  ) {
+    return this.entrepotService.create(createEntrepotDto, req.user, cityId);
   }
-
+  @Get('MyEntrepots')
+  async MyCars(@Req() req) {
+    const userId = req.user.id;
+    return this.entrepotService.getMyEntrepot(parseInt(userId));
+  }
   @Get(':id')
-  getOrder(@Param('id') id: number) {
+  getEntrepot(@Param('id') id: number) {
     return this.entrepotService.findOne(id);
   }
 
