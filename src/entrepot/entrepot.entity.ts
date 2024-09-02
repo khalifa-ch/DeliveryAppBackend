@@ -18,6 +18,9 @@ export class Entrepot {
   capacity: number;
 
   @Column()
+  name: string;
+
+  @Column()
   address: string;
 
   @CreateDateColumn()

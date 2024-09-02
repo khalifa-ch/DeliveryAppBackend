@@ -7,6 +7,10 @@ export class CreateEntrepotDto {
 
   @IsString()
   @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
   address: string;
 }
 
