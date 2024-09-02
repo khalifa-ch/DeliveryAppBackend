@@ -26,6 +26,16 @@ export class OrderService {
       throw new BadRequestException('plz provide a storeId');
     }
     const store = await this.storeService.getById(parseInt(storeId));
+    const weight = createOrderDto.weight;
+    let tarifKilo;
+    if (weight <= 10) {
+      tarifKilo = 1;
+    } else if (weight > 10 && weight <= 20) {
+      tarifKilo = 1.5;
+    } else {
+      tarifKilo = 2;
+    }
+    order.price = tarifKilo * weight;
     order.store = store;
     return await this.orderRepository.save(order);
   }

@@ -24,9 +24,7 @@ export class OrderController {
   create(
     @Body() createOrderDto: CreateOrderDto,
     @Body('storeId') storeId: string,
-    @Req() req,
   ) {
-    console.log(req.user);
     return this.orderService.create(createOrderDto, storeId);
   }
   @Get('MyOrders')
