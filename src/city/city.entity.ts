@@ -1,5 +1,6 @@
 import { Entrepot } from 'src/entrepot/entrepot.entity';
 import { Store } from 'src/store/store.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   Column,
@@ -29,4 +30,6 @@ export class City {
   @OneToMany(() => Entrepot, (entrepot) => entrepot.city)
   entrepots: Entrepot[];
 
+  @OneToMany(() => User, (user) => user.city)
+  users: User[];
 }

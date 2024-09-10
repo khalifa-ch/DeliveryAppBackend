@@ -32,13 +32,19 @@ export class UserController {
     return this.userService.getStoreOnwners();
   }
   @Post('storeOwner')
-  async createStoreOwner(@Body() createUserDto: CreateUserDto) {
+  async createStoreOwner(
+    @Body() createUserDto: CreateUserDto,
+    // @Body('cityId') cityId: string,
+  ) {
     return await this.userService.createStoreOwner(createUserDto);
   }
 
   @Post('deliverer')
-  async createDeliverer(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.createDeliver(createUserDto);
+  async createDeliverer(
+    @Body() createUserDto: CreateUserDto,
+    @Body('cityId') cityId: string,
+  ) {
+    return await this.userService.createDeliver(createUserDto, cityId);
   }
 
   @Get('/:id')
@@ -77,5 +83,4 @@ export class UserController {
     };
     return this.authService.refreshToken(payload);
   }
- 
 }

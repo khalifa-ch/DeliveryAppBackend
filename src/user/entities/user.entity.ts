@@ -1,8 +1,9 @@
 import { Car } from 'src/car/car.entity';
+import { City } from 'src/city/city.entity';
 import { Entrepot } from 'src/entrepot/entrepot.entity';
 import { Store } from 'src/store/store.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -29,4 +30,7 @@ export class User {
 
   @OneToMany(() => Car, (car) => car.user)
   cars: Car[];
+
+  @ManyToOne(() => City, (city) => city.users)
+  city: City;
 }

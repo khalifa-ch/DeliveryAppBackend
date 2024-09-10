@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from 'src/strategies/jwt.strategy';
 import { RefreshJwtStrategy } from 'src/strategies/refreshJwt.strategy';
 import { UserSeeder } from './user.seeder';
+import { CityModule } from 'src/city/city.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UserSeeder } from './user.seeder';
     PassportModule,
     UserRoleModule,
     RoleModule,
+    CityModule,
   ],
   controllers: [UserController],
   providers: [

@@ -13,6 +13,7 @@ import { RoleEnum } from 'src/role/role.enum';
 import { scrypt as _scrypt, randomBytes } from 'crypto';
 import { promisify } from 'util';
 import { promises } from 'fs';
+import { CityService } from 'src/city/city.service';
 const scrypt = promisify(_scrypt);
 
 @Injectable()
@@ -24,9 +25,13 @@ export class UserService {
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(UserRole)
     private readonly userRoleRepository: Repository<UserRole>,
+    private cityService: CityService,
   ) {}
 
-  async createStoreOwner(storeOwner: CreateUserDto): Promise<User> {
+  async createStoreOwner(
+    storeOwner: CreateUserDto,
+    // cityId: string,
+  ): Promise<User> {
     const storeOwnerExist = await this.findByEmail(storeOwner.email);
     if (storeOwnerExist) {
       throw new BadRequestException('email in use');
@@ -42,7 +47,8 @@ export class UserService {
     storeOwner.password = result;
 
     const newStoreOnwer = this.userRepository.create(storeOwner);
-
+    // const city = await this.cityService.findOne(parseInt(cityId));
+    // newStoreOnwer.city = city;
     const savedStoreOwner = await this.userRepository.save(newStoreOnwer);
 
     const storeOwnerRole = await this.roleRepository.findOne({
@@ -58,7 +64,7 @@ export class UserService {
     return savedStoreOwner;
   }
 
-  async createDeliver(deliver: CreateUserDto): Promise<User> {
+  async createDeliver(deliver: CreateUserDto, cityId: string): Promise<User> {
     const deliverExist = await this.findByEmail(deliver.email);
     if (deliverExist) {
       throw new BadRequestException('email in use');
@@ -75,7 +81,11 @@ export class UserService {
 
     const newDeliver = this.userRepository.create(deliver);
 
+    const city = await this.cityService.findOne(parseInt(cityId));
+    newDeliver.city = city;
+
     const savedDeliver = await this.userRepository.save(newDeliver);
+
 
     const deliverRole = await this.roleRepository.findOne({
       where: { name: RoleEnum.Deliverer },
@@ -105,7 +115,7 @@ export class UserService {
 
   async findByEmail(email: string) {
     return await this.userRepository.findOneBy({ email });
-  }   
+  }
 
   async update(id: number, attrs: Partial<User>) {
     const user = await this.userRepository.findOneBy({ id: id });
@@ -127,21 +137,28 @@ export class UserService {
   }
   async getDeliverers(): Promise<User[]> {
     const users = await this.userRepository
-    .createQueryBuilder('user')
-    .leftJoinAndSelect('user.userRoles', 'userRole')
-    .leftJoinAndSelect('userRole.role', 'role')
-    .getMany();
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userRoles', 'userRole')
+      .leftJoinAndSelect('userRole.role', 'role')
+      .getMany();
 
-  return users.filter(user => user.userRoles.length > 0 && user.userRoles[0].role.name === RoleEnum.Deliverer)
+    return users.filter(
+      (user) =>
+        user.userRoles.length > 0 &&
+        user.userRoles[0].role.name === RoleEnum.Deliverer,
+    );
   }
   async getStoreOnwners(): Promise<User[]> {
     const users = await this.userRepository
-    .createQueryBuilder('user')
-    .leftJoinAndSelect('user.userRoles', 'userRole')
-    .leftJoinAndSelect('userRole.role', 'role')
-    .getMany();
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userRoles', 'userRole')
+      .leftJoinAndSelect('userRole.role', 'role')
+      .getMany();
 
-  return users.filter(user => user.userRoles.length > 0 && user.userRoles[0].role.name === RoleEnum.StoreOwner)
+    return users.filter(
+      (user) =>
+        user.userRoles.length > 0 &&
+        user.userRoles[0].role.name === RoleEnum.StoreOwner,
+    );
   }
-
 }
