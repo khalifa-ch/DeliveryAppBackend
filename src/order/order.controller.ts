@@ -24,11 +24,12 @@ export class OrderController {
   create(
     @Body() createOrderDto: CreateOrderDto,
     @Body('storeId') storeId: string,
+    @Body('cityId') cityId: string,
   ) {
-    return this.orderService.create(createOrderDto, storeId);
+    return this.orderService.create(createOrderDto, storeId, cityId);
   }
   @Get('MyOrders')
-  async MyCars(@Query('storeId') storeId: number, @Req() req) {
+  async MyOrders(@Query('storeId') storeId: number, @Req() req) {
     const userId = req.user.id;
     console.log(req.user);
     return this.orderService.getMyOrders(parseInt(userId), storeId);

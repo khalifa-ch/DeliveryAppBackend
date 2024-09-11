@@ -8,6 +8,7 @@ import { Order } from './order.entity';
 import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/order.dto';
 import { StoreService } from 'src/store/store.service';
+import { CityService } from 'src/city/city.service';
 
 @Injectable()
 export class OrderService {
@@ -15,17 +16,25 @@ export class OrderService {
     @InjectRepository(Order)
     private orderRepository: Repository<Order>,
     private storeService: StoreService,
+    private cityService: CityService,
   ) {}
 
   async create(
     createOrderDto: CreateOrderDto,
     storeId: string,
+    cityId: string,
   ): Promise<Order> {
     const order = this.orderRepository.create(createOrderDto);
     if (!storeId) {
       throw new BadRequestException('plz provide a storeId');
     }
+    if (!cityId) {
+      throw new BadRequestException('plz provide a cityId');
+    }
+
     const store = await this.storeService.getById(parseInt(storeId));
+    const city = await this.cityService.findOne(parseInt(cityId));
+
     const weight = createOrderDto.weight;
     let tarifKilo;
     if (weight <= 10) {
@@ -37,6 +46,7 @@ export class OrderService {
     }
     order.price = tarifKilo * weight;
     order.store = store;
+    order.destination = city;
     return await this.orderRepository.save(order);
   }
 

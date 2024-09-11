@@ -1,4 +1,5 @@
 import { Entrepot } from 'src/entrepot/entrepot.entity';
+import { Order } from 'src/order/order.entity';
 import { Store } from 'src/store/store.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -32,4 +33,7 @@ export class City {
 
   @OneToMany(() => User, (user) => user.city)
   users: User[];
+  
+  @OneToMany(() => Order, (order) => order.destination)
+  orders: Order[];
 }

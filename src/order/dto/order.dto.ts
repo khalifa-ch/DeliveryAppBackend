@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsString,
   Max,
   Min,
 } from 'class-validator';
@@ -15,9 +16,9 @@ export class CreateOrderDto {
   @Max(100, { message: 'The weight cannot exceed 100 kg' })
   weight: number;
 
-  @IsNumber()
-  @IsOptional()
-  price?: number;
+  @IsNotEmpty()
+  @IsString()
+  clientPhoneNumber: string;
 }
 
 export class UpdateOrderDto {
