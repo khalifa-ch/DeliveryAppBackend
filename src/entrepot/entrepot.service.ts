@@ -12,6 +12,8 @@ export class EntrepotService {
     @InjectRepository(Entrepot)
     private readonly entrepotRepository: Repository<Entrepot>,
     private cityService: CityService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(
@@ -61,6 +63,28 @@ export class EntrepotService {
       .where('entrepot.user= :userId', { userId })
       .getMany();
 
+    return entrepots;
+  }
+
+  async findEntrepotsByDelivererCity(delivererId: number) {
+    const deliverer = await this.userRepository.findOne({
+      where: { id: delivererId },
+      relations: ['city'],
+    });
+
+    if (!deliverer) {
+      throw new Error('Deliverer not found');
+    }
+
+    const entrepots = await this.entrepotRepository
+      .createQueryBuilder('entrepot')
+      .leftJoinAndSelect('entrepot.city', 'city')
+      .where('city.id = :cityId', { cityId: deliverer.city.id })
+      .getMany();
+
+    if (!entrepots.length) {
+      throw new NotFoundException('Aucun entrepôt trouvé dans cette ville');
+    }
     return entrepots;
   }
 }

@@ -1,4 +1,5 @@
 import { City } from 'src/city/city.entity';
+import { Order } from 'src/order/order.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
@@ -7,6 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -33,4 +35,7 @@ export class Entrepot {
 
   @ManyToOne(() => City, (city) => city.entrepots)
   city: City;
+
+  @OneToMany(() => Order, (order) => order.entrepot)
+  orders:Order[];
 }

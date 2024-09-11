@@ -10,6 +10,7 @@ import { OrderStatus } from './oderStatus';
 import { Store } from 'src/store/store.entity';
 import { City } from 'src/city/city.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Entrepot } from 'src/entrepot/entrepot.entity';
 
 @Entity()
 export class Order {
@@ -44,8 +45,11 @@ export class Order {
   clientPhoneNumber: string;
 
   @ManyToOne(() => User, (user) => user.pickedOrders)
-  pickedBy: User
+  pickedBy: User;
 
   @ManyToOne(() => User, (user) => user.deliveredOrders)
   deliveredBy: User;
+
+  @ManyToOne(() => Entrepot, (entrepot) => entrepot.orders)
+  entrepot: Entrepot;
 }

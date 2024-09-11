@@ -32,6 +32,12 @@ export class EntrepotController {
     const userId = req.user.id;
     return this.entrepotService.getMyEntrepot(parseInt(userId));
   }
+
+  @Get('availableEntrepots')
+  async getAvailableEntrepots(@Req() req) {
+    const userId = req.user.id;
+    return this.entrepotService.findEntrepotsByDelivererCity(parseInt(userId));
+  }
   @Get(':id')
   getEntrepot(@Param('id') id: number) {
     return this.entrepotService.findOne(id);
