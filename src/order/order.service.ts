@@ -10,6 +10,8 @@ import { CreateOrderDto } from './dto/order.dto';
 import { StoreService } from 'src/store/store.service';
 import { CityService } from 'src/city/city.service';
 import { User } from 'src/user/entities/user.entity';
+import { OrderStatus } from './oderStatus';
+import { Entrepot } from 'src/entrepot/entrepot.entity';
 
 @Injectable()
 export class OrderService {
@@ -20,6 +22,8 @@ export class OrderService {
     private cityService: CityService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Entrepot)
+    private entrepotRepository: Repository<Entrepot>,
   ) {}
 
   async create(
@@ -114,4 +118,69 @@ export class OrderService {
 
     return orders;
   }
+
+  async assignEntrepotToOrder(
+    orderId: number,
+    entrepotId: number,
+    delivererId: number,
+  ): Promise<Order> {
+    // Récupérer la commande
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, status: OrderStatus.PENDING },
+    });
+    if (!order) {
+      throw new NotFoundException(
+        'Order not found or not available for delivery',
+      );
+    }
+
+    // Récupérer l'entrepôt
+    const entrepot = await this.entrepotRepository.findOneBy({
+      id: entrepotId,
+    });
+    if (!entrepot) {
+      throw new NotFoundException('Entrepot not found');
+    }
+    const deliverer = await this.userRepository.findOne({
+      where: { id: delivererId },
+    });
+    // Mettre à jour l'ordre avec l'entrepôt
+    order.entrepot = entrepot;
+    order.status = OrderStatus.SHIPPED; // Mettre à jour le statut
+    order.pickedBy = deliverer; // Optionnel: affecter le livreur
+
+    // Sauvegarder l'ordre mis à jour
+    return this.orderRepository.save(order);
+  }
+
+  // async getMyOrdersInEntrepot(entrepotId: number) {
+  //   const orders = this.orderRepository
+  //     .createQueryBuilder('order')
+  //     .leftJoin('order.entrepot', 'entrepot')
+  //     .leftJoinAndSelect('order.pickedBy', 'pickedBy')
+  //     .leftJoinAndSelect('order.destination', 'destination')
+  //     .where('entrepot.id = :entrepotId', { entrepotId });
+
+  //   return orders.getMany();
+  // }
+  async getMyOrdersInEntrepot(entrepotId: number) {
+    const orders = this.orderRepository
+      .createQueryBuilder('order')
+      .select([
+        'order.id', // Sélectionne l'ID de la commande (ou d'autres colonnes nécessaires)
+        'order.weight',
+        'order.price',
+        'order.status',
+        'pickedBy.lastName', // Sélectionne uniquement le nom de famille du livreur
+        'pickedBy.firstName', // Sélectionne uniquement le nom de famille du livreur
+        'destination.name' // Sélectionne le nom de la destination (ville)
+      ])
+      .leftJoin('order.entrepot', 'entrepot')
+      .leftJoin('order.pickedBy', 'pickedBy') // Jointure pour l'attribut pickedBy
+      .leftJoin('order.destination', 'destination') // Jointure pour l'attribut destination
+      .where('entrepot.id = :entrepotId', { entrepotId });
+  
+    return orders.getMany();
+  }
+  
 }

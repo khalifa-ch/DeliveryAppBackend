@@ -38,6 +38,10 @@ export class OrderController {
     const userId = req.user.id;
     return this.orderService.getOrdersReadyForPickupByDeliverer(userId);
   }
+  @Get('getMyOrdersInEntrepot')
+  getMyOrdersInEntrepot(@Query('entrepotId') entrepotId: number) {
+    return this.orderService.getMyOrdersInEntrepot(entrepotId);
+  }
   @Get(':id')
   getOrder(@Param('id') id: number) {
     return this.orderService.findOne(id);
@@ -53,8 +57,22 @@ export class OrderController {
   ): Promise<Order> {
     return this.orderService.update(id, updateOrderDto);
   }
+  @Patch('assign-entrepot/:orderId')
+  async assignEntrepot(
+    @Param('orderId') orderId: number,
+    @Body('entrepotId') entrepotId: number,
+    @Req() req,
+  ) {
+    const userId = req.user.id;
+    return this.orderService.assignEntrepotToOrder(
+      orderId,
+      entrepotId,
+      parseInt(userId),
+    );
+  }
   @Delete(':id')
   async remove(@Param('id') id: number) {
     return this.orderService.remove(id);
   }
+ 
 }
