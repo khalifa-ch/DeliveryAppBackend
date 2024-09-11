@@ -38,5 +38,6 @@ import { CityModule } from 'src/city/city.module';
     RefreshJwtStrategy,
     UserSeeder,
   ],
+  exports: [TypeOrmModule],
 })
 export class UserModule {}

@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/order.dto';
 import { StoreService } from 'src/store/store.service';
 import { CityService } from 'src/city/city.service';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class OrderService {
@@ -17,6 +18,8 @@ export class OrderService {
     private orderRepository: Repository<Order>,
     private storeService: StoreService,
     private cityService: CityService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(
@@ -88,5 +91,27 @@ export class OrderService {
     }
 
     return orders.getMany();
+  }
+
+  async getOrdersReadyForPickupByDeliverer(delivererId: number) {
+    const deliverer = await this.userRepository.findOne({
+      where: { id: delivererId },
+      relations: ['city'],
+    });
+
+    if (!deliverer) {
+      throw new Error('Deliverer not found');
+    }
+
+    // Fetch orders with pending status from stores in the same city as the deliverer
+    const orders = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.store', 'store')
+      .leftJoin('store.city', 'city')
+      .where('order.status = :status', { status: 'Pending' })
+      .andWhere('city.id = :cityId', { cityId: deliverer.city.id })
+      .getMany();
+
+    return orders;
   }
 }

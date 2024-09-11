@@ -31,10 +31,13 @@ export class OrderController {
   @Get('MyOrders')
   async MyOrders(@Query('storeId') storeId: number, @Req() req) {
     const userId = req.user.id;
-    console.log(req.user);
     return this.orderService.getMyOrders(parseInt(userId), storeId);
   }
-
+  @Get('pickupOrders')
+  async getOrdersReadyForPickup(@Req() req) {
+    const userId = req.user.id;
+    return this.orderService.getOrdersReadyForPickupByDeliverer(userId);
+  }
   @Get(':id')
   getOrder(@Param('id') id: number) {
     return this.orderService.findOne(id);
