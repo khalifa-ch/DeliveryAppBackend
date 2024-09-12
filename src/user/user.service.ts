@@ -140,6 +140,7 @@ export class UserService {
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userRoles', 'userRole')
       .leftJoinAndSelect('userRole.role', 'role')
+      .leftJoinAndSelect('user.city','city')
       .getMany();
 
     return users.filter(
