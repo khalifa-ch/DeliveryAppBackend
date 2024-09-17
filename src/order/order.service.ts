@@ -61,6 +61,16 @@ export class OrderService {
     return await this.orderRepository.find();
   }
 
+  async findShippedOrders(): Promise<Order[]> {
+    const orders = await this.orderRepository.find({
+      where: { status: OrderStatus.SHIPPED },
+    });
+    if (!orders) {
+      return null;
+    }
+
+    return orders;
+  }
   async findOne(id: number): Promise<Order> {
     const order = await this.orderRepository.findOneBy({ id });
     if (!order) {
@@ -88,7 +98,7 @@ export class OrderService {
     const orders = this.orderRepository
       .createQueryBuilder('order')
       .leftJoin('order.store', 'store')
-      .leftJoinAndSelect('order.destination','destination')
+      .leftJoinAndSelect('order.destination', 'destination')
       .where('store.userId = :userId', { userId });
 
     if (storeId) {
@@ -174,14 +184,13 @@ export class OrderService {
         'order.status',
         'pickedBy.lastName', // Sélectionne uniquement le nom de famille du livreur
         'pickedBy.firstName', // Sélectionne uniquement le nom de famille du livreur
-        'destination.name' // Sélectionne le nom de la destination (ville)
+        'destination.name', // Sélectionne le nom de la destination (ville)
       ])
       .leftJoin('order.entrepot', 'entrepot')
       .leftJoin('order.pickedBy', 'pickedBy') // Jointure pour l'attribut pickedBy
       .leftJoin('order.destination', 'destination') // Jointure pour l'attribut destination
       .where('entrepot.id = :entrepotId', { entrepotId });
-  
+
     return orders.getMany();
   }
-  
 }

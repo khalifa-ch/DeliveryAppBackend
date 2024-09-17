@@ -29,7 +29,7 @@ export class OrderController {
     return this.orderService.create(createOrderDto, storeId, cityId);
   }
   @Get('MyOrders')
-  async MyOrders(@Query('storeId') storeId: number, @Req() req) {
+  async MyOrdersInStore(@Query('storeId') storeId: number, @Req() req) {
     const userId = req.user.id;
     return this.orderService.getMyOrders(parseInt(userId), storeId);
   }
@@ -42,6 +42,10 @@ export class OrderController {
   getMyOrdersInEntrepot(@Query('entrepotId') entrepotId: number) {
     return this.orderService.getMyOrdersInEntrepot(entrepotId);
   }
+  @Get('ShippedOrders')
+  getShippedOrders() {
+    return this.orderService.findShippedOrders();
+  }
   @Get(':id')
   getOrder(@Param('id') id: number) {
     return this.orderService.findOne(id);
@@ -50,6 +54,7 @@ export class OrderController {
   getAll() {
     return this.orderService.findAll();
   }
+
   @Patch(':id')
   async update(
     @Param('id') id: number,
@@ -74,5 +79,4 @@ export class OrderController {
   async remove(@Param('id') id: number) {
     return this.orderService.remove(id);
   }
- 
 }
